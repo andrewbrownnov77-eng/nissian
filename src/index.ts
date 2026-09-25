@@ -15,11 +15,14 @@
  * crawl any seed whose host is not in that scope.
  */
 
+import { readFile, writeFile } from "node:fs/promises";
 import { Scope, ScopeError } from "./config/scope.js";
 import { Crawler } from "./crawler/browser.js";
 import { analyzeRelationships } from "./analysis/relationships.js";
 import { analyzeTokens } from "./analysis/tokens.js";
 import { writeResult, summarize } from "./report/collector.js";
+import { runValidation, type ValidationPlan } from "./validate/runner.js";
+import { renderReport } from "./report/report.js";
 import type { DiscoveryResult } from "./types.js";
 
 interface Args {
@@ -84,6 +87,35 @@ async function discover(argv: string[]): Promise<void> {
   console.error(`\n[done] full result written to ${args.out}`);
 }
 
+async function validate(argv: string[]): Promise<void> {
+  let scopePath: string | undefined;
+  let planPath: string | undefined;
+  let out = "report.md";
+  for (let i = 0; i < argv.length; i++) {
+    switch (argv[i]) {
+      case "--scope": scopePath = argv[++i]; break;
+      case "--plan": planPath = argv[++i]; break;
+      case "--out": out = argv[++i]; break;
+      default:
+        if (argv[i].startsWith("--")) throw new Error(`unknown flag: ${argv[i]}`);
+    }
+  }
+  if (!scopePath) throw new Error("--scope <file> is required");
+  if (!planPath) throw new Error("--plan <file> is required (validation plan: targets + identities)");
+
+  const scope = await Scope.load(scopePath);
+  const plan = JSON.parse(await readFile(planPath, "utf8")) as ValidationPlan;
+
+  console.error(`[scope] program: ${scope.config.program}`);
+  console.error(`[scope] allowed test types: ${scope.config.allowedTestTypes.join(", ")}`);
+
+  const result = await runValidation(scope, plan);
+  const report = renderReport(result);
+  await writeFile(out, report, "utf8");
+  console.log(report);
+  console.error(`\n[done] confirmed=${result.findings.length} refuted=${result.refuted.length} inconclusive=${result.inconclusive.length}; report written to ${out}`);
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   try {
@@ -91,8 +123,11 @@ async function main(): Promise<void> {
       case "discover":
         await discover(rest);
         break;
+      case "validate":
+        await validate(rest);
+        break;
       default:
-        console.error("usage: nissian discover --scope <file> --seed <url> [options]");
+        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]");
         process.exit(cmd ? 1 : 0);
     }
   } catch (err) {

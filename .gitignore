@@ -6,4 +6,8 @@ dist/
 scope.json
 scope.*.json
 !scope.example.json
+plan.json
+plan.*.json
+!plan.example.json
 discovery*.json
+report*.md
