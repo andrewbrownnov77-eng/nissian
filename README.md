@@ -131,7 +131,11 @@ See `plan.example.json` for the validation-plan format.
   state changes LIFO, and destructive-action gating (DELETE / billing /
   notification writes need explicit opt-in, and in safe mode may only target
   synthetic values). All state changes funnel through `MutationClient`.
-- **Stage 6 — Cross-target memory** (planned)
+- **Stage 6 — Cross-target memory** ✅ — a persisted experience layer:
+  WAF-fingerprint→encoding success rates (best-first recommendations), a
+  version-aware stack-gadget library (a Spring Boot 2.7 gadget fires on 2.7.3
+  but not 3.0), and per-program pay/N-A history that ranks vuln classes by
+  expected value. Stored in a gitignored `memory.json`.
 - **Stage 7 — Human-readable narratives** (planned)
 - **Stage 8 — Autonomous triage & duplicate detection** (planned)
 
