@@ -142,7 +142,25 @@ See `plan.example.json` for the validation-plan format.
   siphoning), and gives stack-aware remediation (React → kill the
   `dangerouslySetInnerHTML` sink + CSP; nginx → server-block headers).
   `nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>]`
-- **Stage 8 — Autonomous triage & duplicate detection** (planned)
+- **Stage 8 — Autonomous triage & duplicate detection** ✅ — scores each
+  finding's confidence, checks it against public disclosed reports and your own
+  memory (catches "already reported on scan #42, closed WONTFIX"), and
+  partitions into file / low-confidence appendix / suppressed-duplicate — never
+  deleting anything, so you can override.
+  `nissian triage --findings <file> [--priors <file>] [--threshold 0.6]`
+
+## Full pipeline
+
+```
+discover → validate → coverage → narrate → triage
+   │           │          │          │         │
+ recon +    confirmed   what you    attack    what to
+ candidates  findings   didn't test  story    actually file
+```
+
+Each command reads the previous stage's JSON output, so you can run them
+end-to-end or independently. Stages 3, 5, and 6 (throttle/auth, safe-mode +
+rollback, cross-target memory) apply throughout.
 
 ## License
 

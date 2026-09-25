@@ -29,6 +29,8 @@ import { renderCoverage } from "./coverage/report.js";
 import { composeNarrative } from "./narrative/narrative.js";
 import type { NarrativeFinding } from "./narrative/chain.js";
 import type { StackSignals } from "./narrative/remediation.js";
+import { triage, renderTriage } from "./triage/triage.js";
+import type { PriorArtifact } from "./triage/dedup.js";
 import type { DiscoveryResult } from "./types.js";
 import type { ValidationResult } from "./validate/types.js";
 
@@ -192,6 +194,35 @@ async function narrate(argv: string[]): Promise<void> {
   console.error(`\n[done] narrative written to ${out}`);
 }
 
+async function triageCmd(argv: string[]): Promise<void> {
+  let findingsPath: string | undefined;
+  let priorsPath: string | undefined;
+  let out = "triage.md";
+  let threshold = 0.6;
+  for (let i = 0; i < argv.length; i++) {
+    switch (argv[i]) {
+      case "--findings": findingsPath = argv[++i]; break;
+      case "--priors": priorsPath = argv[++i]; break;
+      case "--threshold": threshold = Number(argv[++i]); break;
+      case "--out": out = argv[++i]; break;
+      default:
+        if (argv[i].startsWith("--")) throw new Error(`unknown flag: ${argv[i]}`);
+    }
+  }
+  if (!findingsPath) throw new Error("--findings <validation-result.json> is required");
+
+  const result = JSON.parse(await readFile(findingsPath, "utf8")) as ValidationResult;
+  // Consider confirmed + inconclusive; refuted never gets filed anyway.
+  const candidates = [...result.findings, ...result.inconclusive];
+  const priors: PriorArtifact[] = priorsPath ? JSON.parse(await readFile(priorsPath, "utf8")) : [];
+
+  const triaged = triage(candidates, priors, threshold);
+  const rendered = renderTriage(triaged);
+  await writeFile(out, rendered, "utf8");
+  console.log(rendered);
+  console.error(`\n[done] file=${triaged.toFile.length} appendix=${triaged.appendix.length} duplicates=${triaged.duplicates.length}; written to ${out}`);
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   try {
@@ -208,8 +239,11 @@ async function main(): Promise<void> {
       case "narrate":
         await narrate(rest);
         break;
+      case "triage":
+        await triageCmd(rest);
+        break;
       default:
-        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]\n  nissian coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]\n  nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>] [--out narrative.md]");
+        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]\n  nissian coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]\n  nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>] [--out narrative.md]\n  nissian triage --findings <file> [--priors <file>] [--threshold 0.6] [--out triage.md]");
         process.exit(cmd ? 1 : 0);
     }
   } catch (err) {
