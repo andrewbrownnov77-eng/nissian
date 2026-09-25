@@ -1,10 +1,10 @@
 {
-  "name": "nissian",
+  "name": "garand",
   "version": "0.1.0",
   "description": "Scope-aware bug bounty reconnaissance assistant. Stage 1: deep contextual discovery.",
   "type": "module",
   "bin": {
-    "nissian": "dist/index.js"
+    "garand": "dist/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

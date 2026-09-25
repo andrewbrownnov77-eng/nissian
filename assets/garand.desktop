@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Garand
+GenericName=Bug Bounty Recon Assistant
+Comment=Scope-aware authorized bug bounty reconnaissance & validation
+Exec=garand
+Icon=garand
+Terminal=true
+Categories=Development;Security;
+Keywords=security;bugbounty;recon;pentest;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * nissian — scope-aware bug bounty reconnaissance assistant.
+ * garand — scope-aware bug bounty reconnaissance assistant.
  *
  * Stage 1: deep contextual discovery. Given a scope file and one or more
  * in-scope seed URLs, it crawls with a real browser, captures the API surface,
@@ -8,7 +8,7 @@
  * client-side tokens — producing a structured result for later stages.
  *
  * Usage:
- *   nissian discover --scope ./scope.json --seed https://app.example.com [--seed ...]
+ *   garand discover --scope ./scope.json --seed https://app.example.com [--seed ...]
  *                    [--out ./discovery.json] [--max-pages 50] [--settle 1500]
  *
  * By design it refuses to run without an authorized scope file, and refuses to
@@ -243,7 +243,7 @@ async function main(): Promise<void> {
         await triageCmd(rest);
         break;
       default:
-        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]\n  nissian coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]\n  nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>] [--out narrative.md]\n  nissian triage --findings <file> [--priors <file>] [--threshold 0.6] [--out triage.md]");
+        console.error("usage:\n  garand discover --scope <file> --seed <url> [options]\n  garand validate --scope <file> --plan <file> [--out report.md]\n  garand coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]\n  garand narrate --findings <file> [--stack react,nginx] [--server <hdr>] [--out narrative.md]\n  garand triage --findings <file> [--priors <file>] [--threshold 0.6] [--out triage.md]");
         process.exit(cmd ? 1 : 0);
     }
   } catch (err) {

@@ -10,14 +10,14 @@
  * Rules:
  *   - identifiers are fresh random UUIDs, never harvested real ones
  *   - emails use the reserved example.com domain (RFC 2606) and a nonce
- *   - names/strings carry a "nissian-test-" prefix so they're greppable
+ *   - names/strings carry a "garand-test-" prefix so they're greppable
  *   - numbers stay in a benign, clearly-fake band
  */
 
 import { randomUUID, randomBytes } from "node:crypto";
 
 /** A stable, greppable marker on every synthetic value. */
-export const TEST_MARKER = "nissian-test";
+export const TEST_MARKER = "garand-test";
 
 export function safeUuid(): string {
   return randomUUID();

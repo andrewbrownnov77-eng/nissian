@@ -1,4 +1,4 @@
-# nissian
+# garand
 
 A **scope-aware bug bounty reconnaissance assistant**. Built for authorized
 testing only — it operates strictly inside a bounty program's declared scope,
@@ -33,7 +33,7 @@ file.
 
 ## Scope is the point, not a limitation
 
-`nissian` refuses to start without a scope file, and refuses to crawl any seed
+`garand` refuses to start without a scope file, and refuses to crawl any seed
 whose host isn't in scope. At the network layer, requests to out-of-scope hosts
 are **aborted before they're sent** and recorded as warnings for manual review.
 This is deliberate: once "am I authorized to touch this?" is answered up front,
@@ -125,9 +125,9 @@ See `plan.example.json` for the validation-plan format.
   introspection / sitemap, diff against actual crawl coverage, and emit a gap
   report that says *why* each untested endpoint was unreachable (403 → escalate
   a role and re-scan, 401 → needs creds, never-reached → add a flow).
-  `nissian coverage --discovery <file> [--openapi|--graphql|--sitemap <f>]`
+  `garand coverage --discovery <file> [--openapi|--graphql|--sitemap <f>]`
 - **Stage 5 — Poisoning awareness** ✅ — safe-mode mutators (synthetic UUIDs,
-  `nissian-test-` names, `@example.com` emails), a rollback journal that undoes
+  `garand-test-` names, `@example.com` emails), a rollback journal that undoes
   state changes LIFO, and destructive-action gating (DELETE / billing /
   notification writes need explicit opt-in, and in safe mode may only target
   synthetic values). All state changes funnel through `MutationClient`.
@@ -141,13 +141,13 @@ See `plan.example.json` for the validation-plan format.
   context-aware business consequence (XSS on a donation page → donor-card
   siphoning), and gives stack-aware remediation (React → kill the
   `dangerouslySetInnerHTML` sink + CSP; nginx → server-block headers).
-  `nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>]`
+  `garand narrate --findings <file> [--stack react,nginx] [--server <hdr>]`
 - **Stage 8 — Autonomous triage & duplicate detection** ✅ — scores each
   finding's confidence, checks it against public disclosed reports and your own
   memory (catches "already reported on scan #42, closed WONTFIX"), and
   partitions into file / low-confidence appendix / suppressed-duplicate — never
   deleting anything, so you can override.
-  `nissian triage --findings <file> [--priors <file>] [--threshold 0.6]`
+  `garand triage --findings <file> [--priors <file>] [--threshold 0.6]`
 
 ## Full pipeline
 
