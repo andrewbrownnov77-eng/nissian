@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+
+# Local scope files & run outputs may contain program-specific / sensitive data.
+scope.json
+scope.*.json
+!scope.example.json
+discovery*.json
