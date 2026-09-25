@@ -30,8 +30,19 @@ powershell -ExecutionPolicy Bypass -File assets\install-windows.ps1
 ```
 
 This drops **Garand.lnk** on your desktop, pointing at `assets\garand.cmd`
-with `assets\garand.ico` as the icon. Double-clicking opens a terminal running
-the CLI (append args by editing the shortcut Target, e.g. `... discover ...`).
+with `assets\garand.ico` as the icon.
+
+**Garand is a command-line tool, not a windowed app.** Double-clicking the icon
+opens a PowerShell terminal parked in the project with a `garand` command ready
+to use — it does *not* pop up a graphical window. Type your commands there, e.g.:
+
+```
+garand discover --scope scope.json --seed https://app.example.com
+garand validate --scope scope.json --plan plan.json
+```
+
+If the window flashes and closes instead, the project isn't built — run
+`npm install ; npm run build` in the repo first, then use the icon again.
 
 ## Windows 11 (manual)
 Right-click desktop → New → Shortcut → location `…\assets\garand.cmd` →
