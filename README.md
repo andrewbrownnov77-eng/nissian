@@ -123,8 +123,11 @@ See `plan.example.json` for the validation-plan format.
 - **Stage 3 — Adaptability & operational polish** ✅
 - **Stage 4 — Differential coverage mapping** (planned): diff OpenAPI/GraphQL/
   sitemap against actual crawl coverage; report the gaps.
-- **Stage 5 — Poisoning awareness** (planned): safe-mode mutators, rollback
-  scripting, destructive-flag gating.
+- **Stage 5 — Poisoning awareness** ✅ — safe-mode mutators (synthetic UUIDs,
+  `nissian-test-` names, `@example.com` emails), a rollback journal that undoes
+  state changes LIFO, and destructive-action gating (DELETE / billing /
+  notification writes need explicit opt-in, and in safe mode may only target
+  synthetic values). All state changes funnel through `MutationClient`.
 - **Stage 6 — Cross-target memory** (planned)
 - **Stage 7 — Human-readable narratives** (planned)
 - **Stage 8 — Autonomous triage & duplicate detection** (planned)
