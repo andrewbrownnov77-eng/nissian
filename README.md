@@ -77,13 +77,57 @@ See `scope.example.json`. Fields:
 | `allowedTestTypes` | Which active tests later stages may generate. Absent ⇒ passive.    |
 | `rateLimit`        | Politeness limits so you never degrade a target.                   |
 
+## Stage 2 — Reliable validation (zero false positives)
+
+Turns Stage 1 candidates into **confirmed** findings backed by reproducible
+evidence. Every probe returns `CONFIRMED` / `REFUTED` / `INCONCLUSIVE`, and only
+confirmed findings reach a report:
+
+- **Blind SQLi** — statistical, time-based (baseline vs. delayed samples with a
+  separation guard), so noise can't fake a finding.
+- **SSRF** — fires at a controlled OOB collector and captures the exact inbound
+  request the target made.
+- **IDOR/BOLA** — two identities; confirms attacker reads victim's object, and
+  rules out "it's just public data".
+- **Reflected XSS** — renders in real Chromium and detects actual execution,
+  after ruling out CSP / X-XSS-Protection.
+
+```bash
+npm run build
+node dist/index.js validate --scope ./scope.json --plan ./plan.json --out report.md
+```
+
+See `plan.example.json` for the validation-plan format.
+
+## Stage 3 — Adaptability & operational polish
+
+- **Adaptive throttle** (`src/stealth/throttle.ts`) — backs off on 429/503,
+  honors `Retry-After`, eases back up on success, optional off-hours windows.
+  Good citizenship, structurally enforced.
+- **Auth-flow intelligence** (`src/auth/session.ts`) — auto-login, early JWT
+  refresh from the token's own `exp`, re-auth on a killed session, and
+  `refreshBefore()` to survive session-invalidating endpoints.
+- **WAF-aware encoding** (`src/stealth/waf.ts`) — equivalent payload encodings
+  to confirm a bug isn't merely filter-masked. For *truthful reporting*, not
+  evading a defender.
+- **Program-identity tagging** (`src/stealth/identity.ts`) — the anti-ghost:
+  tags every request with your researcher handle so the security team can tell
+  authorized testing from an attack (what most programs require).
+- **Format-perfect output** (`src/report/templates.ts`) — HackerOne / custom
+  templates with CWE, CVSS vector, and a stack-aware remediation.
+
 ## Roadmap
 
-- **Stage 1 — Deep contextual discovery** ✅ (this)
-- **Stage 2 — Active analysis**: scope-gated IDOR/token/auth probing driven by
-  Stage 1 candidates.
-- **Stage 3 — Triage & reporting**: dedup, CVSS scoring, reproducible PoC
-  report drafts.
+- **Stage 1 — Deep contextual discovery** ✅
+- **Stage 2 — Reliable validation** ✅
+- **Stage 3 — Adaptability & operational polish** ✅
+- **Stage 4 — Differential coverage mapping** (planned): diff OpenAPI/GraphQL/
+  sitemap against actual crawl coverage; report the gaps.
+- **Stage 5 — Poisoning awareness** (planned): safe-mode mutators, rollback
+  scripting, destructive-flag gating.
+- **Stage 6 — Cross-target memory** (planned)
+- **Stage 7 — Human-readable narratives** (planned)
+- **Stage 8 — Autonomous triage & duplicate detection** (planned)
 
 ## License
 
