@@ -136,7 +136,12 @@ See `plan.example.json` for the validation-plan format.
   version-aware stack-gadget library (a Spring Boot 2.7 gadget fires on 2.7.3
   but not 3.0), and per-program pay/N-A history that ranks vuln classes by
   expected value. Stored in a gitignored `memory.json`.
-- **Stage 7 — Human-readable narratives** (planned)
+- **Stage 7 — Human-readable narratives** ✅ — chains findings into an attack
+  story (enumeration + IDOR-on-export → bulk data exposure), maps each to a
+  context-aware business consequence (XSS on a donation page → donor-card
+  siphoning), and gives stack-aware remediation (React → kill the
+  `dangerouslySetInnerHTML` sink + CSP; nginx → server-block headers).
+  `nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>]`
 - **Stage 8 — Autonomous triage & duplicate detection** (planned)
 
 ## License

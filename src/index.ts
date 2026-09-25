@@ -26,7 +26,11 @@ import { renderReport } from "./report/report.js";
 import { parseOpenApi, parseGraphQLIntrospection, parseSitemap, dedupeEndpoints, type Endpoint } from "./coverage/spec-parser.js";
 import { computeCoverage } from "./coverage/diff.js";
 import { renderCoverage } from "./coverage/report.js";
+import { composeNarrative } from "./narrative/narrative.js";
+import type { NarrativeFinding } from "./narrative/chain.js";
+import type { StackSignals } from "./narrative/remediation.js";
 import type { DiscoveryResult } from "./types.js";
+import type { ValidationResult } from "./validate/types.js";
 
 interface Args {
   scope?: string;
@@ -154,6 +158,40 @@ async function coverage(argv: string[]): Promise<void> {
   console.error(`\n[done] ${report.coveragePct}% coverage; report written to ${out}`);
 }
 
+async function narrate(argv: string[]): Promise<void> {
+  let findingsPath: string | undefined;
+  let stackArg = "";
+  let server: string | undefined;
+  let out = "narrative.md";
+  for (let i = 0; i < argv.length; i++) {
+    switch (argv[i]) {
+      case "--findings": findingsPath = argv[++i]; break;
+      case "--stack": stackArg = argv[++i]; break;
+      case "--server": server = argv[++i]; break;
+      case "--out": out = argv[++i]; break;
+      default:
+        if (argv[i].startsWith("--")) throw new Error(`unknown flag: ${argv[i]}`);
+    }
+  }
+  if (!findingsPath) throw new Error("--findings <file> is required (validation result JSON, or a JSON array of {type,endpoint})");
+
+  const raw = JSON.parse(await readFile(findingsPath, "utf8"));
+  // Accept either a ValidationResult or a bare array of narrative findings.
+  const findings: NarrativeFinding[] = Array.isArray(raw)
+    ? raw
+    : (raw as ValidationResult).findings.map((f) => ({ type: f.type, endpoint: f.endpoint, title: f.title, severity: f.severity }));
+
+  const stack: StackSignals = {
+    frameworks: stackArg ? stackArg.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean) : [],
+    server,
+  };
+
+  const narrative = composeNarrative({ findings, stack });
+  await writeFile(out, narrative, "utf8");
+  console.log(narrative);
+  console.error(`\n[done] narrative written to ${out}`);
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   try {
@@ -167,8 +205,11 @@ async function main(): Promise<void> {
       case "coverage":
         await coverage(rest);
         break;
+      case "narrate":
+        await narrate(rest);
+        break;
       default:
-        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]\n  nissian coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]");
+        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]\n  nissian coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]\n  nissian narrate --findings <file> [--stack react,nginx] [--server <hdr>] [--out narrative.md]");
         process.exit(cmd ? 1 : 0);
     }
   } catch (err) {
