@@ -1,0 +1,19 @@
+node_modules/
+dist/
+*.log
+
+# Local scope files & run outputs may contain program-specific / sensitive data.
+scope.json
+scope.*.json
+!scope.example.json
+plan.json
+plan.*.json
+!plan.example.json
+discovery*.json
+report*.md
+coverage*.md
+
+# Cross-target memory is engagement-specific and can be sensitive — never commit.
+memory.json
+memory/
+*.memory.json

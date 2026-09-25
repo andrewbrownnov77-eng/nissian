@@ -1,0 +1,21 @@
+{
+  "program": "Example Corp Public Bounty",
+  "inScope": [
+    "*.example.com",
+    "api.example.com"
+  ],
+  "outOfScope": [
+    "blog.example.com",
+    "status.example.com"
+  ],
+  "allowedTestTypes": [
+    "passive-observation",
+    "idor-probe",
+    "token-manipulation",
+    "auth-workflow"
+  ],
+  "rateLimit": {
+    "maxRequestsPerSecond": 4,
+    "maxConcurrency": 4
+  }
+}

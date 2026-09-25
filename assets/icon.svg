@@ -1,0 +1,58 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="garand">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#111a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="128" y1="96" x2="384" y2="416" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- app tile -->
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="url(#bg)"/>
+  <rect x="16.5" y="16.5" width="479" height="479" rx="103.5" fill="none" stroke="#1e2b45" stroke-width="1"/>
+
+  <!-- shield: authorized scope / defensive posture -->
+  <path d="M256 96 L392 146 V262 C392 342 332 396 256 424 C180 396 120 342 120 262 V146 Z"
+        fill="none" stroke="url(#accent)" stroke-width="12" stroke-linejoin="round" opacity="0.9"/>
+
+  <!-- crosshair reticle: targeted, in-scope hunting -->
+  <g stroke="url(#accent)" stroke-width="9" stroke-linecap="round" opacity="0.55" filter="url(#glow)">
+    <line x1="256" y1="150" x2="256" y2="186"/>
+    <line x1="256" y1="330" x2="256" y2="366"/>
+    <line x1="168" y1="258" x2="204" y2="258"/>
+    <line x1="308" y1="258" x2="344" y2="258"/>
+  </g>
+
+  <!-- bug body -->
+  <g filter="url(#glow)">
+    <ellipse cx="256" cy="270" rx="52" ry="64" fill="url(#accent)"/>
+    <circle cx="256" cy="206" r="26" fill="url(#accent)"/>
+    <!-- segment lines -->
+    <line x1="212" y1="252" x2="300" y2="252" stroke="#0b1220" stroke-width="7" stroke-linecap="round"/>
+    <line x1="208" y1="286" x2="304" y2="286" stroke="#0b1220" stroke-width="7" stroke-linecap="round"/>
+    <line x1="256" y1="220" x2="256" y2="330" stroke="#0b1220" stroke-width="7" stroke-linecap="round"/>
+    <!-- antennae -->
+    <path d="M242 188 C230 168 224 160 210 156" stroke="url(#accent)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M270 188 C282 168 288 160 302 156" stroke="url(#accent)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <!-- legs -->
+    <g stroke="url(#accent)" stroke-width="8" stroke-linecap="round">
+      <path d="M206 244 C182 236 170 232 154 220" fill="none"/>
+      <path d="M204 274 C180 274 166 276 150 282" fill="none"/>
+      <path d="M206 304 C184 312 172 318 158 332" fill="none"/>
+      <path d="M306 244 C330 236 342 232 358 220" fill="none"/>
+      <path d="M308 274 C332 274 346 276 362 282" fill="none"/>
+      <path d="M306 304 C328 312 340 318 354 332" fill="none"/>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <text x="256" y="470" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="52" font-weight="700" letter-spacing="6" fill="#e5edff">garand</text>
+</svg>

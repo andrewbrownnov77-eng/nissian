@@ -1,0 +1,26 @@
+{
+  "target": "Example Corp — validation run",
+  "identities": {
+    "attacker": { "name": "attacker", "headers": { "Authorization": "Bearer <ATTACKER_TOKEN>" } },
+    "victim":   { "name": "victim",   "headers": { "Authorization": "Bearer <VICTIM_TOKEN>" } }
+  },
+  "oob": { "publicBaseUrl": "http://oob.your-collector.example", "port": 8081 },
+  "sqli": [
+    { "urlTemplate": "https://api.example.com/products?id={INJECT}", "method": "GET" }
+  ],
+  "xss": [
+    { "urlTemplate": "https://app.example.com/search?q={INJECT}" }
+  ],
+  "ssrf": [
+    { "urlTemplate": "https://api.example.com/fetch?url={INJECT}", "method": "GET" }
+  ],
+  "idor": [
+    {
+      "attacker": "attacker",
+      "victim": "victim",
+      "victimObjectUrl": "https://api.example.com/user/VICTIM_ID/orders",
+      "method": "GET",
+      "victimDataMarker": "victim@example.com"
+    }
+  ]
+}

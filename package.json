@@ -1,0 +1,34 @@
+{
+  "name": "garand",
+  "version": "0.1.0",
+  "description": "Scope-aware bug bounty reconnaissance assistant. Stage 1: deep contextual discovery.",
+  "type": "module",
+  "bin": {
+    "garand": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "discover": "node --loader ts-node/esm src/index.ts discover",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "security",
+    "bug-bounty",
+    "reconnaissance",
+    "authorized-testing"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.47.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
