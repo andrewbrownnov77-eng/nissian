@@ -121,8 +121,11 @@ See `plan.example.json` for the validation-plan format.
 - **Stage 1 — Deep contextual discovery** ✅
 - **Stage 2 — Reliable validation** ✅
 - **Stage 3 — Adaptability & operational polish** ✅
-- **Stage 4 — Differential coverage mapping** (planned): diff OpenAPI/GraphQL/
-  sitemap against actual crawl coverage; report the gaps.
+- **Stage 4 — Differential coverage mapping** ✅ — parse OpenAPI / GraphQL
+  introspection / sitemap, diff against actual crawl coverage, and emit a gap
+  report that says *why* each untested endpoint was unreachable (403 → escalate
+  a role and re-scan, 401 → needs creds, never-reached → add a flow).
+  `nissian coverage --discovery <file> [--openapi|--graphql|--sitemap <f>]`
 - **Stage 5 — Poisoning awareness** ✅ — safe-mode mutators (synthetic UUIDs,
   `nissian-test-` names, `@example.com` emails), a rollback journal that undoes
   state changes LIFO, and destructive-action gating (DELETE / billing /

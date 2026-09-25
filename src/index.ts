@@ -23,6 +23,9 @@ import { analyzeTokens } from "./analysis/tokens.js";
 import { writeResult, summarize } from "./report/collector.js";
 import { runValidation, type ValidationPlan } from "./validate/runner.js";
 import { renderReport } from "./report/report.js";
+import { parseOpenApi, parseGraphQLIntrospection, parseSitemap, dedupeEndpoints, type Endpoint } from "./coverage/spec-parser.js";
+import { computeCoverage } from "./coverage/diff.js";
+import { renderCoverage } from "./coverage/report.js";
 import type { DiscoveryResult } from "./types.js";
 
 interface Args {
@@ -116,6 +119,41 @@ async function validate(argv: string[]): Promise<void> {
   console.error(`\n[done] confirmed=${result.findings.length} refuted=${result.refuted.length} inconclusive=${result.inconclusive.length}; report written to ${out}`);
 }
 
+async function coverage(argv: string[]): Promise<void> {
+  let discoveryPath: string | undefined;
+  let openapiPath: string | undefined;
+  let graphqlPath: string | undefined;
+  let sitemapPath: string | undefined;
+  let out = "coverage.md";
+  for (let i = 0; i < argv.length; i++) {
+    switch (argv[i]) {
+      case "--discovery": discoveryPath = argv[++i]; break;
+      case "--openapi": openapiPath = argv[++i]; break;
+      case "--graphql": graphqlPath = argv[++i]; break;
+      case "--sitemap": sitemapPath = argv[++i]; break;
+      case "--out": out = argv[++i]; break;
+      default:
+        if (argv[i].startsWith("--")) throw new Error(`unknown flag: ${argv[i]}`);
+    }
+  }
+  if (!discoveryPath) throw new Error("--discovery <discovery.json> is required (Stage 1 output)");
+  if (!openapiPath && !graphqlPath && !sitemapPath) {
+    throw new Error("provide at least one spec: --openapi, --graphql, or --sitemap");
+  }
+
+  const discovery = JSON.parse(await readFile(discoveryPath, "utf8")) as DiscoveryResult;
+  const known: Endpoint[] = [];
+  if (openapiPath) known.push(...parseOpenApi(JSON.parse(await readFile(openapiPath, "utf8"))));
+  if (graphqlPath) known.push(...parseGraphQLIntrospection(JSON.parse(await readFile(graphqlPath, "utf8"))));
+  if (sitemapPath) known.push(...parseSitemap(await readFile(sitemapPath, "utf8")));
+
+  const report = computeCoverage(dedupeEndpoints(known), discovery.requests);
+  const rendered = renderCoverage(report);
+  await writeFile(out, rendered, "utf8");
+  console.log(rendered);
+  console.error(`\n[done] ${report.coveragePct}% coverage; report written to ${out}`);
+}
+
 async function main(): Promise<void> {
   const [cmd, ...rest] = process.argv.slice(2);
   try {
@@ -126,8 +164,11 @@ async function main(): Promise<void> {
       case "validate":
         await validate(rest);
         break;
+      case "coverage":
+        await coverage(rest);
+        break;
       default:
-        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]");
+        console.error("usage:\n  nissian discover --scope <file> --seed <url> [options]\n  nissian validate --scope <file> --plan <file> [--out report.md]\n  nissian coverage --discovery <file> [--openapi <f>] [--graphql <f>] [--sitemap <f>]");
         process.exit(cmd ? 1 : 0);
     }
   } catch (err) {
